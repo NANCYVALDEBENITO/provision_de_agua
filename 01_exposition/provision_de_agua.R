@@ -570,5 +570,75 @@ csvname     <-  "exposition.csv"
 csvfile     <-  paste(csvpath,csvname,sep="")
 write.table(na.omit(exposition_data),csvfile,row.names=FALSE, sep=",")
 
+library(geoR) 
+library(maptools)
+library(sp)
+library(gstat)
+library(leaflet)
+library(ggplot2)
+library(lattice)
+library(raster)
+library(rpart)
+library(maptools)
+library(rgdal)
 
-#com<-readShapePoints('w_code_qsta_1001002.shp')
+lim<-readShapePoly('code_qsta_1001002.shp')
+exp <- read.csv(file="/home/nvaldebenito/Documentos/01_provision_de_agua/01_exposition/01_results/exposition.csv", header=TRUE, sep=",")
+class(exp) # data.frame
+coordinates(exp)<-~longitude+latitude # whatever the equivalent is in your 
+# data.frame
+class(exp) 
+
+proj4string(exp)<- CRS("+proj=longlat +datum=WGS84 +no_defs")
+proj4string(lim)<- CRS("+proj=longlat +datum=WGS84 +no_defs")
+
+plot(exp)
+plot(lim, add=T)
+
+lim_extent<-extent(lim)
+extent(exp)
+
+lim_reproj          <- spTransform(lim,"+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs")
+exp_reproj          <- spTransform(exp,"+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs")
+
+extent(lim_reproj)
+extent(exp_reproj)
+#creating a grid in utm projection  
+grilla <- expand.grid(x=seq(from=453840.7, to=494488.1, by=100), y=seq(from=7992153, to=8011565, by=100))
+coordinates(grilla) <- ~ x+y
+gridded(grilla) <- TRUE 
+proj4string(grilla) <- CRS("+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs")
+
+#ploting grid and variables
+plot(grilla, col="grey")
+plot(exp_reproj, add=T, col="blue")
+
+#renamming to new grid
+g2<-grilla
+
+##inverse distance weighted interpolation
+
+#interpolating temperature and precipitation
+exp_int <- idw(exposition ~ 1, exp_reproj, g2, idp = 2.5)
+
+exp_ras<- raster(exp_int)
+
+#reprojecting 
+exp_reproj<-projectExtent(exp_ras, crs="+proj=longlat +datum=WGS84 +no_defs")
+exp_ras<-projectRaster(exp_ras, exp_reproj)
+
+#creating a crop and mask
+crop_exp<- crop(exp_ras,lim_extent)
+exp_ras <- raster(nrow=194.12, ncol=406.474, xmn=-69.43625 , xmx=-69.05208 , ymn=-18.15958, ymx=-17.98403)
+exp_reproj<-projectExtent(exp_ras, crs="+proj=longlat +datum=WGS84 +no_defs")
+exp_ras<-projectRaster(exp_ras, exp_reproj)
+exp_ras <-resample(crop_exp,exp_ras, method="bilinear")
+mask_exp<- mask(exp_ras,lim)
+
+
+jpeg('exp_int_grid.jpg')
+plot(mask_exp, col=rev(heat.colors(20)), main="Interpolated Exposition")
+contour(mask_exp, add=T, drawlabels=T, col='white')
+dev.off()
+
+writeRaster(mask_exp,filename="exp_int",format="GTiff",overwrite=TRUE)
