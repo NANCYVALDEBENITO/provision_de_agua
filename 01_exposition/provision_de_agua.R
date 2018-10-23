@@ -11,7 +11,7 @@ library(sp)
 library(raster)
 
 ##netcdf precipitation
-ncpath  <- "/home/nvaldebenito/Documentos/01_provision_de_agua/"
+ncpath  <- "/home/nvaldebenito/Documentos/01_provision_de_agua/01_exposition/"
 ncname  <- "pr_CL-09_MPI-M-MPI-ESM-MR_historical_r1i1p1_CR2-RegCM4-6_v4_mon_19950101-19981231"
 ncfname <- paste(ncpath, ncname, ".nc", sep="")  #variable 
 dname   <- "pr"
@@ -131,7 +131,7 @@ names(tmp_df02) <- c("lon","lat", time_real[i]) #change de name variable time wi
 
 ###write out the dataframe in csv format
  
-csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/Results/"
+csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/01_exposition/01_results/"
 csvname     <-  "pr_CL-09_1976_month.csv"
 csvfile     <-  paste(csvpath,csvname,sep="")
 write.table(na.omit(tmp_df02),csvfile,row.names=FALSE, sep=",")
@@ -395,7 +395,7 @@ new_date    <- data.frame(cbind(longitude, latitude, january_mean, february_mean
 #fix(new_date)
 
 
-csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/Results/"
+csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/01_exposition/01_results/"
 csvname     <-  "pr_CL-09_1976_monthly_statistics.csv"
 csvfile     <-  paste(csvpath,csvname,sep="")
 write.table(na.omit(new_date),csvfile,row.names=FALSE, sep=",")
@@ -453,7 +453,7 @@ IEP_december<-union(IEP_december,calculate_IEP(december, december_mean, december
 
 IEP<- data.frame(cbind( latitude, longitude, IEP_january, IEP_february, IEP_march, IEP_april, IEP_may, IEP_june, IEP_july, IEP_august, IEP_september, IEP_october, IEP_november, IEP_december))
 
-csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/Results/"
+csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/01_exposition/01_results/"
 csvname     <-  "IEP_calculated.csv"
 csvfile     <-  paste(csvpath,csvname,sep="")
 write.table(na.omit(IEP),csvfile,row.names=FALSE, sep=",")
@@ -508,7 +508,7 @@ mdrought_december<-append(mdrought_december,mdrought(IEP_december))
 
 mdrought_data<- data.frame(cbind( latitude, longitude, mdrought_january, mdrought_february, mdrought_march, mdrought_april, mdrought_may, mdrought_june, mdrought_july, mdrought_august, mdrought_september, mdrought_october, mdrought_november, mdrought_december))
 
-csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/Results/"
+csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/01_exposition/01_results/"
 csvname     <-  "mdrought_calculated.csv"
 csvfile     <-  paste(csvpath,csvname,sep="")
 write.table(na.omit(mdrought_data),csvfile,row.names=FALSE, sep=",")
