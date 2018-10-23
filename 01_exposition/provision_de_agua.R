@@ -545,15 +545,30 @@ for (k in seq(1,8,by=1)){
 }
 print(point) #file names
 
+exposition<-c()
 for (i in seq(1,length(point),by=1)){
 	
 	n <- seq(0,length(point)-1,by=1)
-	#assign(point[i],rep(seq(1+n[i],32+n[i],by=8),each=12))
+	
 	j <-seq(1+n[i],32+n[i],by=8)
 	print(j)
 	data<-sum(mdrought_january[j]+mdrought_february[j],mdrought_march[j],mdrought_april[j],mdrought_may[j],mdrought_june[j],
 	mdrought_july[j],mdrought_august[j],mdrought_september[j],mdrought_october[j],mdrought_november[j],mdrought_december[j])
 	print(data)
+    exposition<-append(exposition,data)
 
 		
 }
+
+
+print(exposition)
+
+exposition_data<- data.frame(cbind( latitude, longitude, exposition))
+
+csvpath     <- "/home/nvaldebenito/Documentos/01_provision_de_agua/01_exposition/01_results/"
+csvname     <-  "exposition.csv"
+csvfile     <-  paste(csvpath,csvname,sep="")
+write.table(na.omit(exposition_data),csvfile,row.names=FALSE, sep=",")
+
+
+#com<-readShapePoints('w_code_qsta_1001002.shp')
